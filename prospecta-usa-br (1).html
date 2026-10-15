@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prospecta USA-BR — Encontre negócios de brasileiros nos EUA</title>
+<style>
+  :root{
+    --bg:#0B1220;
+    --panel:#111A2B;
+    --card:#16213A;
+    --border:#233252;
+    --text:#F1F3F8;
+    --muted:#8B93A7;
+    --accent:#F2A65A;
+    --whats:#25D366;
+    --whats-dark:#1DA851;
+    --danger:#E24B4A;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Inter,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:32px 20px 80px;}
+  header{margin-bottom:28px;}
+  .eyebrow{
+    font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);
+    font-weight:600;margin:0 0 8px;
+  }
+  h1{font-size:26px;margin:0 0 8px;font-weight:600;}
+  .sub{color:var(--muted);font-size:14px;line-height:1.6;margin:0;}
+
+  .panel{
+    background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+    padding:20px;margin-bottom:24px;
+  }
+  .panel h2{font-size:14px;margin:0 0 14px;font-weight:600;color:var(--text);}
+  .row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+  .field{flex:1;min-width:180px;display:flex;flex-direction:column;gap:6px;}
+  label{font-size:12px;color:var(--muted);}
+  input,textarea{
+    background:#0D1526;border:1px solid var(--border);border-radius:8px;
+    color:var(--text);padding:10px 12px;font-size:14px;font-family:inherit;
+  }
+  input:focus,textarea:focus{outline:none;border-color:var(--accent);}
+  textarea{resize:vertical;min-height:64px;}
+  .hint{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;}
+  .hint a{color:var(--accent);}
+
+  button{
+    background:var(--accent);color:#1A1204;border:none;border-radius:8px;
+    padding:11px 20px;font-size:14px;font-weight:600;cursor:pointer;
+  }
+  button:hover{opacity:.9;}
+  button:disabled{opacity:.5;cursor:not-allowed;}
+  button.secondary{background:transparent;border:1px solid var(--border);color:var(--text);}
+
+  #status{font-size:13px;color:var(--muted);margin-top:10px;min-height:18px;}
+  #status.error{color:var(--danger);}
+
+  .results{display:flex;flex-direction:column;gap:12px;}
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+  }
+  .card .info{flex:1;min-width:200px;}
+  .card .name{font-size:15px;font-weight:600;margin:0 0 4px;}
+  .card .addr{font-size:13px;color:var(--muted);margin:0 0 6px;}
+  .card .meta{font-size:12px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;}
+  .card .meta span{display:inline-flex;align-items:center;gap:4px;}
+  .badge{
+    display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;
+    background:#1F2A42;color:var(--muted);
+  }
+  .badge.no-phone{background:#3A2222;color:#F0AFAF;}
+
+  .wa-btn{
+    display:inline-flex;align-items:center;gap:8px;background:var(--whats);color:#04210F;
+    padding:10px 16px;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;
+    white-space:nowrap;
+  }
+  .wa-btn:hover{background:var(--whats-dark);}
+  .wa-btn.disabled{background:#233252;color:var(--muted);pointer-events:none;}
+
+  .empty{text-align:center;color:var(--muted);font-size:14px;padding:40px 0;}
+  .counter{font-size:13px;color:var(--muted);margin-bottom:12px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Prospecção EUA · Diáspora brasileira</p>
+    <h1>Encontre negócios de brasileiros nos EUA e chame no WhatsApp</h1>
+    <p class="sub">Busca por negócios que se identificam como brasileiros no Google Maps (nome, categoria ou descrição) em qualquer cidade dos EUA, e manda sua oferta de site direto pro WhatsApp deles.</p>
+  </header>
+
+  <div class="panel">
+    <h2>1. Configuração (uma vez só)</h2>
+    <div class="row">
+      <div class="field">
+        <label for="apiKey">Chave da Google Maps API</label>
+        <input type="password" id="apiKey" placeholder="Cole sua chave aqui">
+      </div>
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;flex-direction:row;margin-bottom:8px;">
+      <input type="checkbox" id="rememberKey" checked style="width:auto;">
+      Lembrar minha chave neste navegador
+    </label>
+    <p class="hint">
+      Precisa de uma chave com <strong>Maps JavaScript API</strong> e <strong>Places API (New)</strong> ativadas (Google Cloud Console).
+      É gratuito até um volume mensal generoso, depois cobra por uso.
+      Restrinja a chave por domínio quando for hospedar isso de verdade.
+      A chave fica salva só no seu navegador (nunca é enviada pra mim ou pra qualquer servidor além do Google) — se usar computador compartilhado, desmarque a opção acima ou clique em "Esquecer chave" depois.
+    </p>
+    <button type="button" id="forgetKeyBtn" class="secondary" style="margin-top:4px;">Esquecer chave salva</button>
+  </div>
+
+  <div class="panel">
+    <h2>2. Buscar empresas</h2>
+    <div class="row">
+      <div class="field">
+        <label for="niche">Tipo de negócio</label>
+        <input type="text" id="niche" list="nicheOptions" placeholder="ex: churrascaria, contador, corretor de imóveis">
+        <datalist id="nicheOptions">
+          <option value="churrascaria">
+          <option value="mercado brasileiro">
+          <option value="salão de brazilian wax">
+          <option value="contador">
+          <option value="corretor de imóveis">
+          <option value="advogado de imigração">
+          <option value="cabeleireiro">
+          <option value="limpeza residencial">
+          <option value="construção e reforma">
+          <option value="transporte de mudança">
+          <option value="padaria brasileira">
+          <option value="loja de doces brasileiros">
+        </datalist>
+      </div>
+      <div class="field">
+        <label for="cities">Cidades / regiões a cobrir (edite à vontade, separadas por vírgula)</label>
+        <textarea id="cities">Boston MA, Framingham MA, Newark NJ, Elizabeth NJ, New York NY, Danbury CT, Orlando FL, Miami FL, Fort Lauderdale FL, Pompano Beach FL, Atlanta GA, Los Angeles CA, San Francisco CA, Chicago IL, Houston TX, Washington DC, Toronto ON Canada, Montreal QC Canada, Vancouver BC Canada</textarea>
+        <p class="hint">Essa lista já vem com os principais polos de comunidade brasileira nos EUA e Canadá. Remova cidades pra reduzir o número de buscas, ou adicione outras.</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="field" style="flex:0 0 auto;">
+        <label style="display:flex;align-items:center;gap:8px;flex-direction:row;">
+          <input type="radio" name="mode" id="modeKeyword" value="keyword" checked style="width:auto;">
+          Buscar por "Brazilian/brasileiro" no nome
+        </label>
+      </div>
+      <div class="field" style="flex:0 0 auto;">
+        <label style="display:flex;align-items:center;gap:8px;flex-direction:row;">
+          <input type="radio" name="mode" id="modeSurname" value="surname" style="width:auto;">
+          Buscar por sobrenomes brasileiros no nome
+        </label>
+      </div>
+    </div>
+    <div class="row" id="surnameRow" style="display:none;">
+      <div class="field">
+        <label for="surnames">Sobrenomes (edite a lista à vontade, separados por vírgula)</label>
+        <textarea id="surnames">Silva, Santos, Oliveira, Souza, Pereira, Costa, Rodrigues, Almeida, Nascimento, Carvalho, Gomes, Martins, Araujo, Melo, Barbosa, Ribeiro, Alves, Monteiro, Cardoso, Teixeira, Ferreira, Lima, Fernandes, Rocha, Dias</textarea>
+        <p class="hint">Faz uma busca separada pra cada combinação de sobrenome + cidade + nicho e junta tudo numa lista só, sem repetir. Pega principalmente negócios de serviço que usam o sobrenome do dono no nome da empresa (limpeza, construção, corretagem, etc.) — não pega empresas com nome de marca genérico.</p>
+      </div>
+    </div>
+    <div id="callCounter" class="hint" style="margin:-4px 0 4px;"></div>
+    <div class="row">
+      <div class="field">
+        <label for="template">Mensagem padrão do WhatsApp (use {empresa} para o nome)</label>
+        <textarea id="template">Oi! Vi o negócio da {empresa} por aqui — trabalho criando sites profissionais para empresas de brasileiros nos EUA. Posso te mandar uma proposta rápida?</textarea>
+      </div>
+    </div>
+    <button id="searchBtn">Buscar empresas</button>
+    <div id="status"></div>
+  </div>
+
+  <div class="panel">
+    <h2>3. Resultados</h2>
+    <div id="counter" class="counter"></div>
+    <div id="results" class="results">
+      <div class="empty">Faça uma busca acima para ver as empresas encontradas.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let mapsLoaded = false;
+let placesService = null;
+const API_KEY_STORAGE = 'prospecta_usa_br_api_key';
+
+// Carrega a chave salva, se existir
+(function initSavedKey(){
+  const saved = localStorage.getItem(API_KEY_STORAGE);
+  if(saved){
+    document.getElementById('apiKey').value = saved;
+  }
+})();
+
+document.getElementById('forgetKeyBtn').addEventListener('click', () => {
+  localStorage.removeItem(API_KEY_STORAGE);
+  document.getElementById('apiKey').value = '';
+  setStatus('Chave removida deste navegador.');
+});
+
+function loadMapsScript(key, onReady, onError){
+  if(mapsLoaded){ onReady(); return; }
+  const s = document.createElement('script');
+  s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&libraries=places`;
+  s.onload = () => { mapsLoaded = true; onReady(); };
+  s.onerror = () => onError('Não consegui carregar a API do Google. Verifique se a chave está correta e as APIs estão ativadas.');
+  document.head.appendChild(s);
+}
+
+function setStatus(msg, isError){
+  const el = document.getElementById('status');
+  el.textContent = msg || '';
+  el.className = isError ? 'error' : '';
+}
+
+function normalizePhoneForWhatsApp(phone){
+  if(!phone) return null;
+  let digits = phone.replace(/\D/g, '');
+  if(digits.startsWith('0')) digits = digits.substring(1);
+  if(!digits.startsWith('1') && digits.length === 10){
+    digits = '1' + digits; // assume EUA/Canadá se vier sem código de país
+  }
+  return digits;
+}
+
+function renderResults(places){
+  const container = document.getElementById('results');
+  const counter = document.getElementById('counter');
+  container.innerHTML = '';
+
+  if(!places.length){
+    container.innerHTML = '<div class="empty">Nenhuma empresa encontrada. Tente outro nicho ou cidade.</div>';
+    counter.textContent = '';
+    return;
+  }
+
+  counter.textContent = `${places.length} empresa(s) encontrada(s)`;
+
+  const template = document.getElementById('template').value || 'Olá, {empresa}!';
+
+  places.forEach(place => {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const phone = place.nationalPhoneNumber || place.internationalPhoneNumber || null;
+    const waPhone = normalizePhoneForWhatsApp(phone);
+    const name = place.displayName || '(sem nome)';
+    const msg = template.replace(/{empresa}/g, name);
+    const waLink = waPhone ? `whatsapp://send?phone=${waPhone}&text=${encodeURIComponent(msg)}` : null;
+
+    card.innerHTML = `
+      <div class="info">
+        <p class="name">${name}</p>
+        <p class="addr">${place.formattedAddress || ''}</p>
+        <div class="meta">
+          ${place.rating ? `<span>★ ${place.rating} (${place.userRatingCount || 0})</span>` : ''}
+          ${phone ? `<span class="badge">${phone}</span>` : `<span class="badge no-phone">Sem telefone público</span>`}
+        </div>
+      </div>
+      ${waLink
+        ? `<a class="wa-btn" href="${waLink}">Chamar no WhatsApp</a>`
+        : `<span class="wa-btn disabled">Sem WhatsApp</span>`}
+    `;
+    container.appendChild(card);
+  });
+}
+
+document.querySelectorAll('input[name="mode"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    document.getElementById('surnameRow').style.display =
+      document.getElementById('modeSurname').checked ? 'flex' : 'none';
+  });
+});
+
+async function runTextSearch(Place, query){
+  const request = {
+    textQuery: query,
+    fields: ['displayName', 'formattedAddress', 'nationalPhoneNumber', 'internationalPhoneNumber', 'rating', 'userRatingCount'],
+    language: 'en-US',
+    region: 'us',
+    maxResultCount: 20
+  };
+  const { places } = await Place.searchByText(request);
+  return places || [];
+}
+
+function dedupePlaces(places){
+  const seen = new Set();
+  const result = [];
+  for(const p of places){
+    const key = (p.displayName || '') + '|' + (p.formattedAddress || '');
+    if(!seen.has(key)){
+      seen.add(key);
+      result.push(p);
+    }
+  }
+  return result;
+}
+
+function getCitiesList(){
+  return document.getElementById('cities').value.split(',').map(s => s.trim()).filter(Boolean);
+}
+function getSurnamesList(){
+  return document.getElementById('surnames').value.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+function updateCallCounter(){
+  const cities = getCitiesList().length;
+  const mode = document.getElementById('modeSurname').checked ? 'surname' : 'keyword';
+  const surnames = mode === 'surname' ? getSurnamesList().length : 1;
+  const total = cities * surnames;
+  const el = document.getElementById('callCounter');
+  el.textContent = total > 0 ? `Isso vai fazer ${total} busca(s) na API (${cities} cidade(s) × ${surnames} termo(s)).` : '';
+  el.style.color = total > 60 ? 'var(--danger)' : 'var(--muted)';
+}
+document.getElementById('cities').addEventListener('input', updateCallCounter);
+document.getElementById('surnames').addEventListener('input', updateCallCounter);
+document.querySelectorAll('input[name="mode"]').forEach(r => r.addEventListener('change', updateCallCounter));
+updateCallCounter();
+
+document.getElementById('searchBtn').addEventListener('click', () => {
+  const key = document.getElementById('apiKey').value.trim();
+  const niche = document.getElementById('niche').value.trim();
+  const cities = getCitiesList();
+  const mode = document.getElementById('modeSurname').checked ? 'surname' : 'keyword';
+
+  if(!key){ setStatus('Cole sua chave da Google Maps API antes de buscar.', true); return; }
+  if(!niche){ setStatus('Preencha o tipo de negócio.', true); return; }
+  if(!cities.length){ setStatus('Adicione pelo menos uma cidade na lista.', true); return; }
+
+  if(document.getElementById('rememberKey').checked){
+    localStorage.setItem(API_KEY_STORAGE, key);
+  } else {
+    localStorage.removeItem(API_KEY_STORAGE);
+  }
+
+  setStatus('Carregando Google Maps...');
+  document.getElementById('searchBtn').disabled = true;
+
+  loadMapsScript(key, async () => {
+    try {
+      const { Place } = await google.maps.importLibrary('places');
+      let allPlaces = [];
+      const surnames = mode === 'surname' ? getSurnamesList() : null;
+
+      if(mode === 'surname' && !surnames.length){
+        setStatus('Adicione pelo menos um sobrenome.', true);
+        document.getElementById('searchBtn').disabled = false;
+        return;
+      }
+
+      const terms = mode === 'surname' ? surnames : ['Brazilian'];
+      let done = 0;
+      const total = cities.length * terms.length;
+
+      for(const city of cities){
+        for(const term of terms){
+          done++;
+          setStatus(`Buscando "${term}" em ${city}... (${done}/${total})`);
+          const query = mode === 'surname'
+            ? `${term} ${niche} in ${city}`
+            : `${term} ${niche} in ${city}`;
+          const results = await runTextSearch(Place, query);
+          allPlaces = allPlaces.concat(results);
+        }
+      }
+      allPlaces = dedupePlaces(allPlaces);
+
+      document.getElementById('searchBtn').disabled = false;
+
+      if(!allPlaces.length){
+        setStatus('Nenhum resultado encontrado. Tente outro nicho, cidades ou lista de sobrenomes.', true);
+        renderResults([]);
+        return;
+      }
+      setStatus(`Pronto: ${allPlaces.length} empresa(s) carregada(s) em ${cities.length} cidade(s).`);
+      renderResults(allPlaces);
+    } catch (err) {
+      document.getElementById('searchBtn').disabled = false;
+      setStatus('Erro na busca: ' + (err.message || 'verifique a chave e as permissões da API (Places API New).'), true);
+      renderResults([]);
+    }
+  }, (err) => {
+    document.getElementById('searchBtn').disabled = false;
+    setStatus(err, true);
+  });
+});
+</script>
+</body>
+</html>
